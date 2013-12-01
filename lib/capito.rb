@@ -6,11 +6,11 @@ module Capito
 
   class << self
     def locale
-      @locale || I18n.locale
+      read_locale || I18n.locale
     end
 
     def locale=(locale)
-      @locale = locale
+      set_locale locale
     end
 
     def available_locales
@@ -22,14 +22,24 @@ module Capito
     end
 
     def with_locale(locale, &block)
-      previous_locale = self.locale
+      previous_locale = read_locale
       begin
-        self.locale = locale
+        set_locale locale
         result = yield(locale)
       ensure
-        self.locale = previous_locale
+        set_locale previous_locale
       end
       result
+    end
+
+    protected
+
+    def read_locale
+      Thread.current[:capito_locale]
+    end
+
+    def set_locale(locale)
+      Thread.current[:capito_locale] = locale.try(:to_sym)
     end
   end
 end
