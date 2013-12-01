@@ -2,6 +2,20 @@ module Capito
   module Translatable
     extend ActiveSupport::Concern
 
+    # Remark: This method mark for destruction all the translations that are not present in the passed argument
+    def translations_attributes=(translations_attributes)
+      translations_to_destroy = translations.to_a
+
+      translations_attributes.each do |translation_attributes|
+        locale = HashWithIndifferentAccess.new(translation_attributes)[:locale]
+        translation = translation!(locale)
+        translation.attributes = translation_attributes
+        translations_to_destroy.delete translation
+      end
+
+      translations_to_destroy.each { |t| t.mark_for_destruction }
+    end
+
     def translated_locales
       translations.pluck(:locale).map(&:to_sym).to_set
     end
@@ -11,6 +25,7 @@ module Capito
     end
 
     def translation(locale = Capito.locale)
+      locale = locale.try(:to_sym)
       translations.detect { |t| t.locale == locale }
     end
 
@@ -36,7 +51,8 @@ module Capito
           class_name: translation_class.name,
           foreign_key: translation_foreign_key,
           inverse_of: :translated_model,
-          autosave: true
+          autosave: true,
+          dependent: :destroy
         }
 
         cattr_accessor :translated_attribute_names

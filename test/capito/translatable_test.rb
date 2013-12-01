@@ -60,6 +60,43 @@ describe Capito::Translatable do
     end
   end
 
+  describe '#translations_attributes=' do
+    it 'accepts new translations' do
+      subject.translations_attributes = [ { locale: 'en', title: 'my title' } ]
+      subject.save!
+      subject.reload
+      subject.translations.count.must_equal 1
+      subject.translations.first.title.must_equal 'my title'
+    end
+
+    it 'accepts existing translations' do
+      subject.save!
+      subject.translations.create(locale: :en, title: 'my title')
+
+      subject.translations_attributes = [ { locale: 'en', title: 'my new title' } ]
+      subject.save!
+      subject.reload
+      subject.translations.count.must_equal 1
+      subject.translations.first.title.must_equal 'my new title'
+    end
+
+    it 'mark for destruction the translations not present in the attributes specified' do
+      subject.save!
+      translation = subject.translations.create(locale: :en, title: 'my title')
+      subject.translations_attributes = [ { locale: 'fr', title: 'mon titre'} ]
+      translation.marked_for_destruction?.must_equal true
+      translation.destroyed?.must_equal false
+    end
+
+    it 'destroys the translations not present in the attributes specified on save' do
+      subject.save!
+      translation = subject.translations.create(locale: :en, title: 'my title')
+      subject.translations_attributes = [ { locale: 'fr', title: 'mon titre'} ]
+      subject.save!
+      translation.destroyed?.must_equal true
+    end
+  end
+
   describe 'save' do
     it 'save the new translations' do
       translation = subject.translations.build(locale: Capito.locale, title: 'my title')
@@ -77,6 +114,16 @@ describe Capito::Translatable do
     end
   end
 
+  describe 'destroy' do
+    it 'destroys its translations' do
+      subject.save!
+      fr = subject.translations.create(locale: :fr, title: 'mon titre')
+      en = subject.translations.create(locale: :en, title: 'my title')
+      subject.destroy
+      subject.translations.all? { |t| t.destroyed? }.must_equal true
+    end
+  end
+
   describe '#translation' do
     it 'returns the translation for the locale specified' do
       translation = subject.translations.build(locale: :en)
@@ -86,6 +133,12 @@ describe Capito::Translatable do
     it 'returns the translation for the current locale' do
       translation = subject.translations.build(locale: Capito.locale)
       subject.translation.must_equal translation
+    end
+
+    it 'accepts both string and symbol' do
+      translation = subject.translations.build(locale: 'en')
+      subject.translation(:en).must_equal translation
+      subject.translation('en').must_equal translation
     end
   end
 
@@ -104,7 +157,6 @@ describe Capito::Translatable do
       subject.translation!.locale.must_equal Capito.locale
     end
   end
-
 
   describe 'class methods' do
     subject { Product }
