@@ -1,0 +1,6 @@
+language: ruby
+scripts: 'bundle exec rake test'
+env:
+  - DB=sqlite3
+rvm:
+  - 1.9.3

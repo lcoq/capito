@@ -10,9 +10,11 @@ Gem::Specification.new do |s|
   s.license       = 'MIT'
 
   s.files         = `git ls-files`.split('\n')
+
   s.require_paths = ["lib"]
 
-  s.add_dependency 'activerecord', '>= 3.2.12'
+  s.add_dependency 'activerecord', '~> 3.2.12'
+  s.add_dependency 'activemodel', '~> 3.2.12'
 
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'minitest'
