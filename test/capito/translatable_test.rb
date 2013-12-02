@@ -184,17 +184,90 @@ describe Capito::Translatable do
         result.must_include fr
         result.wont_include en
       end
+
+      it 'returns all models that have a translation' do
+        en = Capito.with_locale(:en) { subject.new.tap { |m| m.title = 'foo'; m.save! } }
+        fr = Capito.with_locale(:fr) { subject.new.tap { |m| m.title = 'bar'; m.save! } }
+        untranslated = subject.new.tap { |m| m.save! }
+
+        result = subject.with_translations
+        result.must_include en
+        result.must_include fr
+        result.wont_include untranslated
+      end
     end
 
     describe '#translates' do
       it 'accepts a block which is evaluated by the translation class' do
-        subject.translates { def bar; 'bar'; end }
+        subject.translates(:title) { def bar; 'bar'; end }
         subject.new.translations.build.bar.must_equal 'bar'
       end
     end
 
     it 'translations table name is the translation class table name' do
-      subject.translations_table_name.must_equal subject.translation_class.table_name
+      subject.translations_table_name.must_equal 'product_translations'
+    end
+
+    it 'translated column name is the column name prefixed with the translation class table name' do
+      subject.translated_column_name(:title).must_equal 'product_translations.title'
+    end
+
+    describe 'finders' do
+      it 'responds to finders methods' do
+        subject.respond_to?(:find_by_hidden).must_equal true
+        subject.respond_to?(:find_by_title).must_equal true
+        subject.respond_to?(:find_or_initialize_by_title).must_equal true
+        subject.respond_to?(:find_or_create_by_title).must_equal true
+      end
+
+      it 'find by untranslated attributes' do
+        object = subject.new.tap { |m| m.hidden = true; m.save! }
+        subject.find_by_hidden(true).must_equal object
+      end
+
+      it 'find by translated attributes' do
+        object = subject.new.tap { |m| m.title = 'foo'; m.save! }
+        subject.find_by_title('foo').must_equal object
+      end
+
+      describe 'instantiators' do
+        it 'find' do
+          object = subject.new.tap { |m| m.title = 'foo'; m.save! }
+          subject.find_or_initialize_by_title('foo').must_equal object
+          subject.find_or_create_by_title('foo').must_equal object
+        end
+
+        it 'instantiate' do
+          result = subject.find_or_initialize_by_title('foo', hidden: true)
+          result.persisted?.must_equal false
+          result.title.must_equal 'foo'
+          result.hidden.must_equal true
+        end
+
+        it 'create' do
+          result = subject.find_or_create_by_title('foo', hidden: true)
+          result.persisted?.must_equal true
+          result.title.must_equal 'foo'
+          result.hidden.must_equal true
+        end
+
+        it 'keeps the scope' do
+          category = Category.new.tap { |c| c.save! }
+          category.products.find_or_initialize_by_title('foo').category.must_equal category
+        end
+      end
+    end
+
+    describe 'where' do
+      it 'searches with untranslated attributes' do
+        object = subject.new.tap { |m| m.hidden = true; m.save! }
+        subject.where(hidden: true).first.must_equal object
+      end
+
+      it 'searches with translated attributes' do
+        object = subject.new.tap { |m| m.title = 'foo'; m.save! }
+        subject.where(title: 'foo').first.must_equal object
+      end
     end
   end
 end

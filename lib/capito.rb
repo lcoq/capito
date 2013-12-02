@@ -1,8 +1,10 @@
 require 'active_record'
+require 'patches/active_record/query_methods'
 
 module Capito
   autoload :Translatable, 'capito/translatable'
   autoload :Translation, 'capito/translation'
+  autoload :QueryMethods, 'capito/query_methods'
 
   class << self
     def locale

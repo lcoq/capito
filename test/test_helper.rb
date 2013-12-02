@@ -5,6 +5,11 @@ Bundler.require(:test)
 
 require 'capito'
 
+require 'logger'
+log = '/tmp/capito_test.log'
+FileUtils.touch(log) unless File.exists?(log)
+
+ActiveRecord::Base.logger = Logger.new(log)
 ActiveRecord::Base.establish_connection adapter: 'sqlite3', database: ':memory:'
 
 require 'database_cleaner'

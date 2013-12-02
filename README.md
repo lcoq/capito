@@ -2,17 +2,23 @@
 
 Capito is a Globalize alternative for model translations to ActiveRecord models.
 
-## Why ?
+## Product ready?
 
-Globalize does not handle correctly translation errors with several translations at the same time. 
-Capito is designed to be used on an API more than a simple website.
+No.
+
+## Objectives
+
+Capito is designed to be used on an API.
+
+* Save multiple translations at the same time
+* Properly format validations errors per locale
 
 ## Installation
 
 Simply put this in your Gemfile:
 
 ```ruby
-gem 'capito'
+gem 'capito', git: 'git://github.com/lcoq/capito.git', tag: 'v0.0.1'
 ```
 
 ## Usage
