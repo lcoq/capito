@@ -61,6 +61,10 @@ describe Capito::Translatable do
   end
 
   describe '#translations_attributes=' do
+    it 'is accessible' do
+      subject.attributes = { translations_attributes: [] }
+    end
+
     it 'accepts new translations' do
       subject.translations_attributes = [ { locale: 'en', title: 'my title' } ]
       subject.save!
@@ -238,17 +242,17 @@ describe Capito::Translatable do
         end
 
         it 'instantiate' do
-          result = subject.find_or_initialize_by_title('foo', hidden: true)
+          result = subject.find_or_initialize_by_title('foo', permalink: 'permalink')
           result.persisted?.must_equal false
           result.title.must_equal 'foo'
-          result.hidden.must_equal true
+          result.permalink.must_equal 'permalink'
         end
 
         it 'create' do
-          result = subject.find_or_create_by_title('foo', hidden: true)
+          result = subject.find_or_create_by_title('foo', permalink: 'permalink')
           result.persisted?.must_equal true
           result.title.must_equal 'foo'
-          result.hidden.must_equal true
+          result.permalink.must_equal 'permalink'
         end
 
         it 'keeps the scope' do

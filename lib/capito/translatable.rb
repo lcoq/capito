@@ -51,6 +51,7 @@ module Capito
       end
 
       def translates(*attr_names, &block)
+        attr_accessible :translations_attributes
         translation_class.attr_accessible *attr_names
 
         has_many :translations, {
