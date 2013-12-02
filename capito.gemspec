@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.summary       = s.description
   s.license       = 'MIT'
 
-  s.files         = `git ls-files`.split('\n')
+  s.files         = Dir['README.md', 'LICENSE.txt', 'lib/**/*', 'test/**/*']
 
   s.require_paths = ["lib"]
 

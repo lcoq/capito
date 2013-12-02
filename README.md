@@ -92,9 +92,9 @@ product.update_attributes(translations_attributes: [
 ```
 
 Notice that you'll never have to pass the `id` and the `_destroy` in the attributes, Capito will manage them for you.
-It implies that translations that are not present in the attributes you pass to `Product#update_attributes` will be destroyed.
+It implies that translations that are not present in the attributes you pass to the model `#update_attributes` method will be destroyed.
 
-If you want to update only one translation, you might want to update the model translated attributes, like this :
+If you want to update only one translation, you might want to update the attributes in the model directly, like this :
 (you can omit the `Capito#with_locale` if you want to update the model in the default locale)
 
 ```ruby
