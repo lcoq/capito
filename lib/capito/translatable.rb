@@ -132,6 +132,10 @@ module Capito
           klass = self.const_set(:Translation, Class.new(Capito::Translation))
         end
         klass.belongs_to :translated_model, class_name: name, foreign_key: translation_foreign_key, inverse_of: :translations
+
+        translated_model_alias = self.to_s.demodulize.underscore
+        klass.class_eval %Q{ def #{translated_model_alias}; self.translated_model; end }
+
         klass.validates :locale, presence: true, uniqueness: { scope: translation_foreign_key }
         klass
       end

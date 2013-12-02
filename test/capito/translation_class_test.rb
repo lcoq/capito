@@ -8,6 +8,10 @@ describe 'Capito translation class' do
     subject.translated_model.must_equal translated_model
   end
 
+  it 'alias the class name demodulized to the translated model' do
+    subject.product.must_equal translated_model
+  end
+
   it 'has accessors for locale' do
     subject.locale = :en
     subject.locale.must_equal :en
