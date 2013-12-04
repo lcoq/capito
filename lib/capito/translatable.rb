@@ -60,8 +60,10 @@ module Capito
           foreign_key: translation_foreign_key,
           inverse_of: :translated_model,
           autosave: true,
+          validate: false,
           dependent: :destroy
         }
+        validates_associated :translations
 
         cattr_accessor :translated_attribute_names
         self.translated_attribute_names = attr_names.to_set
@@ -69,7 +71,10 @@ module Capito
         attr_names.each do |attr_name|
           getter = attr_name.to_sym
           setter = "#{attr_name}=".to_sym
-          define_method(setter) { |value| translation!(Capito.locale).send setter, value }
+          define_method(setter) do |value|
+            translation!(Capito.locale).send setter, value
+            attribute_will_change!(getter)
+          end
           define_method(getter) { |locale = Capito.locale| translation(locale).send(getter) if translation(locale) }
         end
 
