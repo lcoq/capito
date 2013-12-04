@@ -109,8 +109,10 @@ describe Capito::Translatable do
     end
 
     it 'updates the existing translations' do
+      translation = subject.translation!
+      translation.title = 'my title'
       subject.save!
-      translation = subject.translations.create(locale: Capito.locale, title: 'my title')
+
       subject.title = 'my new title'
       subject.save!
       translation.title.must_equal 'my new title'
