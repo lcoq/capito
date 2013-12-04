@@ -2,7 +2,7 @@ require_relative '../test_helper'
 
 describe 'Capito translation class' do
   let(:translated_model) { Product.new }
-  subject { translated_model.translations.build }
+  subject { translated_model.translations.build(title: 'my title') }
 
   it 'has a translated model' do
     subject.translated_model.must_equal translated_model

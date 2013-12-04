@@ -164,6 +164,32 @@ describe Capito::Translatable do
     end
   end
 
+  describe 'errors_hash' do
+    it 'contains the translation errors' do
+      subject.translations.build(locale: :fr)
+      subject.valid?.must_equal false
+
+      hash = subject.errors_hash
+      hash[:translations].size.must_equal 1
+
+      errors = hash[:translations].first
+      errors[:locale].must_equal :fr
+      errors[:title].must_equal ["can't be blank"]
+    end
+
+    it 'contains the translation errors even when the locale is not set' do
+      subject.translations.build
+      subject.valid?.must_equal false
+
+      hash = subject.errors_hash
+      hash[:translations].size.must_equal 1
+
+      errors = hash[:translations].first
+      errors[:locale].to_set.must_equal ["is not included in the list", "can't be blank"].to_set
+      errors[:title].must_equal ["can't be blank"]
+    end
+  end
+
   describe 'class methods' do
     subject { Product }
 

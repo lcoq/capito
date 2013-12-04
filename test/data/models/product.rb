@@ -7,5 +7,6 @@ class Product < ActiveRecord::Base
   include Capito::Translatable
   translates :title, autobuild: false do
     delegate :permalink, to: :product, prefix: true
+    validates :title, presence: true
   end
 end

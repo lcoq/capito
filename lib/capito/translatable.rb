@@ -29,6 +29,19 @@ module Capito
       translations.detect { |t| t.locale == locale }
     end
 
+    def errors_hash
+      errors_hash = errors.to_hash
+      if errors_hash.delete(:translations)
+        translations_errors = translations.map do |translation|
+          if translation.errors.present?
+            { locale: translation.locale }.merge(translation.errors.to_hash)
+          end
+        end
+        errors_hash[:translations] = translations_errors
+      end
+      errors_hash
+    end
+
     protected
 
     def build_translation_if_empty
