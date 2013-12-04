@@ -16,4 +16,14 @@ ActiveRecord::Schema.define do
     t.string     :locale
     t.string     :title
   end
+
+  create_table :variations, force: true do |t|
+    t.references :product
+    t.string     :sku
+  end
+
+  create_table :variation_translations, force: true do |t|
+    t.references :variation
+    t.string     :locale
+  end
 end

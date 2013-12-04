@@ -29,6 +29,12 @@ module Capito
       translations.detect { |t| t.locale == locale }
     end
 
+    protected
+
+    def build_translation_if_empty
+      translation!
+    end
+
     module ClassMethods
 
       def with_translations(*locales)
@@ -50,8 +56,16 @@ module Capito
         translation_class.table_name
       end
 
+      # Accepts a list of attribute names that will be translated.
+      # Options:
+      #   * autobuild (boolean) will build a translation before validations if there is no translation built
       def translates(*attr_names, &block)
-        attr_accessible :translations_attributes
+        options = attr_names.extract_options!
+
+        unless options[:autobuild] == false
+          before_validation(:build_translation_if_empty)
+        end
+
         attr_accessible :translations_attributes, *attr_names
         translation_class.attr_accessible *attr_names
 

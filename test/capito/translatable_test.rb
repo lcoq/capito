@@ -194,7 +194,9 @@ describe Capito::Translatable do
       it 'returns all models that have a translation' do
         en = Capito.with_locale(:en) { subject.new.tap { |m| m.title = 'foo'; m.save! } }
         fr = Capito.with_locale(:fr) { subject.new.tap { |m| m.title = 'bar'; m.save! } }
+
         untranslated = subject.new.tap { |m| m.save! }
+        untranslated.translations.destroy_all
 
         result = subject.with_translations
         result.must_include en
@@ -205,8 +207,24 @@ describe Capito::Translatable do
 
     describe '#translates' do
       it 'accepts a block which is evaluated by the translation class' do
-        subject.translates(:title) { def bar; 'bar'; end }
-        subject.new.translations.build.bar.must_equal 'bar'
+        model = subject.new(permalink: 'permalink')
+        translation = model.translations.build
+        translation.respond_to?(:product_permalink).must_equal true
+        translation.product_permalink.must_equal 'permalink'
+      end
+
+      it 'accepts false for :autobuild option' do
+        model = subject.new
+        model.translation.must_be_nil
+        model.valid?
+        model.translation.must_be_nil
+      end
+
+      it 'autobuilds by default' do
+        model = Variation.new
+        model.translation.must_be_nil
+        model.valid?
+        model.translation.wont_be_nil
       end
     end
 
