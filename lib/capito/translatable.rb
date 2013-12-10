@@ -2,6 +2,14 @@ module Capito
   module Translatable
     extend ActiveSupport::Concern
 
+    def translations=(translations)
+      if translations.present? && !(Hash === translations.first)
+        super
+      else
+        self.translations_attributes = translations
+      end
+    end
+
     # Remark: This method mark for destruction all the translations that are not present in the passed argument
     def translations_attributes=(translations_attributes)
       translations_to_destroy = translations.to_a
@@ -45,7 +53,7 @@ module Capito
     protected
 
     def build_translation_if_empty
-      translation!
+      translation! unless translations.present?
     end
 
     module ClassMethods
@@ -79,7 +87,7 @@ module Capito
           before_validation(:build_translation_if_empty)
         end
 
-        attr_accessible :translations_attributes, *attr_names
+        attr_accessible :translations, :translations_attributes, *attr_names
         translation_class.attr_accessible *attr_names
 
         has_many :translations, {
