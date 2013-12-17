@@ -177,6 +177,15 @@ describe Capito::Translatable do
       errors[:title].must_equal ["can't be blank"]
     end
 
+    it 'contains only errored translations' do
+      subject.translation!(:en).title = 'foo'
+      subject.translations.build(locale: :fr)
+      subject.valid?.must_equal false
+
+      hash = subject.errors_hash
+      hash[:translations].size.must_equal 1
+    end
+
     it 'contains the translation errors even when the locale is not set' do
       subject.translations.build
       subject.valid?.must_equal false

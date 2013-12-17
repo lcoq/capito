@@ -44,7 +44,7 @@ module Capito
           if translation.errors.present?
             { locale: translation.locale }.merge(translation.errors.to_hash)
           end
-        end
+        end.compact
         errors_hash[:translations] = translations_errors
       end
       errors_hash
