@@ -1,4 +1,4 @@
-# Capito [![Build Status](https://travis-ci.org/lcoq/capito.png?branch=master)](https://travis-ci.org/lcoq/capito)
+# Capito [![Build Status](https://travis-ci.org/lcoq/capito.png?branch=master)](https://travis-ci.org/lcoq/capito) [![Code Climate](https://codeclimate.com/github/lcoq/capito.png)](https://codeclimate.com/github/lcoq/capito)
 
 Capito is a Globalize alternative for model translations to ActiveRecord models.
 
