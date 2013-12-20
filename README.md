@@ -2,7 +2,7 @@
 
 Capito is a Globalize alternative for model translations to ActiveRecord models.
 
-## Product ready?
+## Production ready?
 
 No.
 
