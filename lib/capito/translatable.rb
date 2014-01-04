@@ -65,12 +65,12 @@ module Capito
       def with_translations(*locales)
         locales = translated_locales.to_a if locales.empty?
         locale_field_name = [ translation_class.table_name, 'locale' ].join('.')
-        scoped.includes(:translations).where(locale_field_name => locales)
+        includes(:translations).where(locale_field_name => locales).references(:translations)
       end
 
       def translated_locales
         locale_field_name = [ translation_class.table_name, 'locale' ].join('.')
-        scoped.joins(:translations).select("DISTINCT #{locale_field_name}").map { |t| t.locale.to_sym }.to_set
+        joins(:translations).select("DISTINCT #{locale_field_name}").map { |t| t.locale.to_sym }.to_set
       end
 
       def translated_column_name(name)
@@ -90,9 +90,6 @@ module Capito
         unless options[:autobuild] == false
           before_validation(:build_translation_if_empty)
         end
-
-        attr_accessible :translations, :translations_attributes, *attr_names
-        translation_class.attr_accessible *attr_names
 
         has_many :translations, {
           class_name: translation_class.name,
@@ -148,11 +145,11 @@ module Capito
         match, attribute_names, translated_attributes, untranslated_attributes = supported_on_missing?(method)
         return super unless match
 
-        scope = scoped.includes(:translations)
+        scope = includes(:translations)
 
         translated_attributes.each do |attribute|
           value = args[attribute_names.index(attribute)]
-          scope = scope.where(translated_column_name(attribute) => value)
+          scope = scope.where(translated_column_name(attribute) => value).references(:translations)
         end
 
         untranslated_attributes.each do |attribute|

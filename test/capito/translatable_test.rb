@@ -284,39 +284,32 @@ describe Capito::Translatable do
     end
 
     describe 'finders' do
-      it 'responds to finders methods' do
-        subject.respond_to?(:find_by_hidden).must_equal true
-        subject.respond_to?(:find_by_title).must_equal true
-        subject.respond_to?(:find_or_initialize_by_title).must_equal true
-        subject.respond_to?(:find_or_create_by_title).must_equal true
-      end
-
       it 'find by untranslated attributes' do
         object = subject.new.tap { |m| m.hidden = true; m.save! }
-        subject.find_by_hidden(true).must_equal object
+        subject.find_by(hidden: true).must_equal object
       end
 
       it 'find by translated attributes' do
         object = subject.new.tap { |m| m.title = 'foo'; m.save! }
-        subject.find_by_title('foo').must_equal object
+        subject.find_by(title: 'foo').must_equal object
       end
 
       describe 'instantiators' do
         it 'find' do
           object = subject.new.tap { |m| m.title = 'foo'; m.save! }
-          subject.find_or_initialize_by_title('foo').must_equal object
-          subject.find_or_create_by_title('foo').must_equal object
+          subject.find_or_initialize_by(title: 'foo').must_equal object
+          subject.find_or_create_by(title: 'foo').must_equal object
         end
 
         it 'instantiate' do
-          result = subject.find_or_initialize_by_title('foo', permalink: 'permalink')
+          result = subject.find_or_initialize_by(title: 'foo', permalink: 'permalink')
           result.persisted?.must_equal false
           result.title.must_equal 'foo'
           result.permalink.must_equal 'permalink'
         end
 
         it 'create' do
-          result = subject.find_or_create_by_title('foo', permalink: 'permalink')
+          result = subject.find_or_create_by(title: 'foo', permalink: 'permalink')
           result.persisted?.must_equal true
           result.title.must_equal 'foo'
           result.permalink.must_equal 'permalink'
@@ -324,7 +317,7 @@ describe Capito::Translatable do
 
         it 'keeps the scope' do
           category = Category.new.tap { |c| c.save! }
-          category.products.find_or_initialize_by_title('foo').category.must_equal category
+          category.products.find_or_initialize_by(title: 'foo').category.must_equal category
         end
       end
     end
