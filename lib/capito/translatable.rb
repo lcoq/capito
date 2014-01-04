@@ -121,48 +121,7 @@ module Capito
         @translation_class ||= define_translation_class
       end
 
-      def respond_to_missing?(method_id, include_private = false)
-        supported_on_missing?(method_id) || super
-      end
-
       private
-
-      def supported_on_missing?(method)
-        match = defined?(::ActiveRecord::DynamicFinderMatch) && ::ActiveRecord::DynamicFinderMatch.match(method)
-        return false unless match
-
-        attribute_names = match.attribute_names.map(&:to_sym)
-        translated_attributes = attribute_names & translated_attribute_names.to_a
-        return false if translated_attributes.empty?
-
-        untranslated_attributes = attribute_names - translated_attributes
-        return false if untranslated_attributes.any? { |attribute| !respond_to?("scoped_by_#{attribute}".to_sym) }
-
-        return [ match, attribute_names, translated_attributes, untranslated_attributes ]
-      end
-
-      def method_missing(method, *args, &block)
-        match, attribute_names, translated_attributes, untranslated_attributes = supported_on_missing?(method)
-        return super unless match
-
-        scope = includes(:translations)
-
-        translated_attributes.each do |attribute|
-          value = args[attribute_names.index(attribute)]
-          scope = scope.where(translated_column_name(attribute) => value).references(:translations)
-        end
-
-        untranslated_attributes.each do |attribute|
-          value = args[attribute_names.index(attribute)]
-          scope = scope.send("scoped_by_#{attribute}".to_sym, value)
-        end
-
-        if match.instantiator?
-          scoped.send :find_or_instantiator_by_attributes, match, attribute_names, *args, &block
-        else
-          scope.send(match.finder)
-        end
-      end
 
       def translation_foreign_key
         table_name.singularize.foreign_key

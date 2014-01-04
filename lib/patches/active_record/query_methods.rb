@@ -11,7 +11,7 @@ module ActiveRecord
         relation = clone
         relation.includes_values = (relation.includes_values + [:translations]).flatten.uniq
         relation.where_values += build_where(opts, rest)
-        relation
+        relation.references(:translations)
       else
         return self if opts.blank?
 
