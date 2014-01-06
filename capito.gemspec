@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name          = 'capito'
-  s.version       = '0.0.2'
+  s.version       = '0.0.3'
 
   s.authors       = [ 'Louis Coquio' ]
   s.email         = [ 'louis.coquio@gmail.com' ]
@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
 
   s.require_paths = ["lib"]
 
-  s.add_dependency 'activerecord', '~> 3.2.12'
-  s.add_dependency 'activemodel', '~> 3.2.12'
+  s.add_dependency 'activerecord', '~> 3.2.9'
+  s.add_dependency 'activemodel', '~> 3.2.9'
 
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'minitest'
