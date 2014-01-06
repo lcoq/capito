@@ -91,6 +91,11 @@ module Capito
           before_validation(:build_translation_if_empty)
         end
 
+        if defined? ProtectedAttributes
+          attr_accessible :translations, :translations_attributes, *attr_names
+          translation_class.attr_accessible *attr_names
+        end
+
         has_many :translations, {
           class_name: translation_class.name,
           foreign_key: translation_foreign_key,

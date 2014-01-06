@@ -4,6 +4,8 @@ module Capito
 
     validates :locale, inclusion: { in: lambda { |t| Capito.available_locales } }
 
+    attr_accessible :locale if defined? ProtectedAttributes
+
     def locale
       read_attribute(:locale).try(:to_sym)
     end
