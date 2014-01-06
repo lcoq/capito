@@ -26,4 +26,15 @@ ActiveRecord::Schema.define do
     t.references :variation
     t.string     :locale
   end
+
+  create_table :pages, force: true do |t|
+    t.string :title
+    t.boolean :hidden
+  end
+
+  create_table :page_translations, force: true do |t|
+    t.references :page
+    t.string     :locale
+    t.string     :title
+  end
 end

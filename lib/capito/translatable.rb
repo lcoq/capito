@@ -114,7 +114,7 @@ module Capito
           setter = "#{attr_name}=".to_sym
           define_method(setter) do |value|
             translation!(Capito.locale).send setter, value
-            attribute_will_change!(getter)
+            attribute_will_change!(getter.to_s)
           end
           define_method(getter) { |locale = Capito.locale| translation(locale).send(getter) if translation(locale) }
         end
@@ -127,6 +127,10 @@ module Capito
       end
 
       private
+
+      def relation
+        super.extending!(QueryMethods)
+      end
 
       def translation_foreign_key
         table_name.singularize.foreign_key

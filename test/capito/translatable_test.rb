@@ -282,56 +282,5 @@ describe Capito::Translatable do
     it 'translated column name is the column name prefixed with the translation class table name' do
       subject.translated_column_name(:title).must_equal 'product_translations.title'
     end
-
-    describe 'finders' do
-      it 'find by untranslated attributes' do
-        object = subject.new.tap { |m| m.hidden = true; m.save! }
-        subject.find_by(hidden: true).must_equal object
-      end
-
-      it 'find by translated attributes' do
-        object = subject.new.tap { |m| m.title = 'foo'; m.save! }
-        subject.find_by(title: 'foo').must_equal object
-      end
-
-      describe 'instantiators' do
-        it 'find' do
-          object = subject.new.tap { |m| m.title = 'foo'; m.save! }
-          subject.find_or_initialize_by(title: 'foo').must_equal object
-          subject.find_or_create_by(title: 'foo').must_equal object
-        end
-
-        it 'instantiate' do
-          result = subject.find_or_initialize_by(title: 'foo', permalink: 'permalink')
-          result.persisted?.must_equal false
-          result.title.must_equal 'foo'
-          result.permalink.must_equal 'permalink'
-        end
-
-        it 'create' do
-          result = subject.find_or_create_by(title: 'foo', permalink: 'permalink')
-          result.persisted?.must_equal true
-          result.title.must_equal 'foo'
-          result.permalink.must_equal 'permalink'
-        end
-
-        it 'keeps the scope' do
-          category = Category.new.tap { |c| c.save! }
-          category.products.find_or_initialize_by(title: 'foo').category.must_equal category
-        end
-      end
-    end
-
-    describe 'where' do
-      it 'searches with untranslated attributes' do
-        object = subject.new.tap { |m| m.hidden = true; m.save! }
-        subject.where(hidden: true).first.must_equal object
-      end
-
-      it 'searches with translated attributes' do
-        object = subject.new.tap { |m| m.title = 'foo'; m.save! }
-        subject.where(title: 'foo').first.must_equal object
-      end
-    end
   end
 end
