@@ -50,6 +50,10 @@ module Capito
       errors_hash
     end
 
+    def destroy_translation(locale)
+      translation(locale).try(:destroy)
+    end
+
     protected
 
     def build_translation_if_empty
