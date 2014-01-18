@@ -13,6 +13,14 @@ end
 
 desc 'Bump gem version'
 task :bump_version, :version do |t, args|
+  tag_version = "v#{args.version}"
+
+  puts "Fetching tags..."
+  `git fetch --tags`
+
+  raise StandardError, "Clean your git status before bumping gem version" unless `git status --porcelain`.empty?
+  raise StandardError, "Tag '#{tag_version}' already exists" unless `git tag -l #{tag_version}`.empty?
+
   gemspec_path = 'capito.gemspec'
   new_gemspec = File.open(gemspec_path) do |f|
     content = f.read
@@ -37,7 +45,6 @@ task :bump_version, :version do |t, args|
   system 'git diff'
   puts "Do you wants to commit this changes ? (Y/n)"
   if STDIN.gets.chomp =~ /y/i
-    tag_version = "v#{args.version}"
     `git add .`
     `git commit -m "Bump version #{tag_version}"`
     `git tag #{tag_version} HEAD`
