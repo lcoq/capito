@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+### Capito 0.0.4 (January 18, 2014)
+
 * `Translatable#destroy_translation`
 
 ### Capito 0.0.3 (January 6, 2014)
