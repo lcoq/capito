@@ -1,5 +1,7 @@
 # Capito Changelog
 
+### Unreleased
+
 ### Capito 0.0.3 (January 6, 2014)
 
 * Update `activerecord` and `activemodel` dependencies to accepts `~> 3.2.9`
