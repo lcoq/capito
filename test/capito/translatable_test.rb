@@ -130,6 +130,18 @@ describe Capito::Translatable do
     end
   end
 
+  describe 'destroy_translation' do
+    it 'destroys the translation' do
+      subject.save!
+      subject.translations.create(locale: :fr, title: 'mon titre')
+      subject.translations.create(locale: :en, title: 'my title')
+      subject.save!
+      subject.translation(:fr).destroyed?.must_equal false
+      subject.destroy_translation(:fr)
+      subject.translation(:fr).destroyed?.must_equal true
+    end
+  end
+
   describe '#translation' do
     it 'returns the translation for the locale specified' do
       translation = subject.translations.build(locale: :en)
