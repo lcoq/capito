@@ -50,7 +50,6 @@ task :bump_version, :version do |t, args|
     `git tag #{tag_version} HEAD`
     puts "Bump version finished"
   else
-    `git reset --hard HEAD`
     puts "Bump version cancelled"
   end
 end
