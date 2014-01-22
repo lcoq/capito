@@ -13,7 +13,9 @@ end
 
 desc 'Bump gem version'
 task :bump_version, :version do |t, args|
-  tag_version = "v#{args.version}"
+  current_version = nil
+  new_version = args.version
+  tag_version = "v#{new_version}"
 
   puts "Fetching tags..."
   `git fetch --tags`
@@ -24,8 +26,8 @@ task :bump_version, :version do |t, args|
   gemspec_path = 'capito.gemspec'
   new_gemspec = File.open(gemspec_path) do |f|
     content = f.read
-    version = content.match(/version\s*=\s*[\'|\"](.*)[\'|\"]/)[1]
-    content.sub version, args.version
+    current_version = content.match(/version\s*=\s*[\'|\"](.*)[\'|\"]/)[1]
+    content.sub current_version, new_version
   end
   IO.write gemspec_path, new_gemspec
 
@@ -37,10 +39,17 @@ task :bump_version, :version do |t, args|
     spaces = $2
 
     date = Time.now.strftime('%B %-d, %Y')
-    released = "### Capito #{args.version} (#{date})"
+    released = "### Capito #{new_version} (#{date})"
     content.sub unreleased, "#{unreleased}#{released}#{spaces}"
   end
   IO.write changelog_path, new_changelog
+
+  readme_path = 'README.md'
+  new_readme = File.open(readme_path) do |f|
+    content = f.read
+    content.gsub current_version, new_version
+  end
+  IO.write readme_path, new_readme
 
   system 'git diff'
   puts "Do you wants to commit this changes ? (Y/n)"
@@ -50,7 +59,6 @@ task :bump_version, :version do |t, args|
     `git tag #{tag_version} HEAD`
     puts "Bump version finished"
   else
-    `git reset --hard HEAD`
     puts "Bump version cancelled"
   end
 end

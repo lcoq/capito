@@ -18,7 +18,7 @@ Capito is designed to be used on an API.
 Simply put this in your Gemfile:
 
 ```ruby
-gem 'capito', git: 'git://github.com/lcoq/capito.git', tag: 'v0.0.1'
+gem 'capito', git: 'git://github.com/lcoq/capito.git', tag: 'v0.0.4'
 ```
 
 ## Usage
