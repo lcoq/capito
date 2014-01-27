@@ -16,6 +16,18 @@ describe 'ActiveRecord integration' do
         subject.find_by(title: 'foo').must_equal object
       end
 
+      it 'find object and load all translations' do
+        product = subject.new
+        Capito.with_locale(:en) { product.title = 'my title' }
+        Capito.with_locale(:fr) { product.title = 'mon titre' }
+        product.save!
+        found = Capito.with_locale(:fr) do
+          Product.find_by(title: 'my title')
+        end
+        found.must_equal product
+        found.translations.size.must_equal 2
+      end
+
       describe 'instantiators' do
         it 'find' do
           object = subject.new.tap { |m| m.title = 'foo'; m.save! }
