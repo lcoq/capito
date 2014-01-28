@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+* Add Rails 4 compatibility
+
 ### Capito 0.0.4 (January 18, 2014)
 
 * `Translatable#destroy_translation`
