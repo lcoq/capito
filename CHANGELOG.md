@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+### Capito 0.0.5 (January 28, 2014)
+
 * Add Rails 4 compatibility
 
 ### Capito 0.0.4 (January 18, 2014)
