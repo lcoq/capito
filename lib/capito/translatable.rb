@@ -65,12 +65,12 @@ module Capito
       def with_translations(*locales)
         locales = translated_locales.to_a if locales.empty?
         locale_field_name = [ translation_class.table_name, 'locale' ].join('.')
-        scoped.includes(:translations).where(locale_field_name => locales)
+        includes(:translations).where(locale_field_name => locales).references(:translations)
       end
 
       def translated_locales
         locale_field_name = [ translation_class.table_name, 'locale' ].join('.')
-        scoped.joins(:translations).select("DISTINCT #{locale_field_name}").map { |t| t.locale.to_sym }.to_set
+        joins(:translations).select("DISTINCT #{locale_field_name}").map { |t| t.locale.to_sym }.to_set
       end
 
       def translated_column_name(name)
@@ -91,8 +91,10 @@ module Capito
           before_validation(:build_translation_if_empty)
         end
 
-        attr_accessible :translations, :translations_attributes, *attr_names
-        translation_class.attr_accessible *attr_names
+        if defined? ProtectedAttributes
+          attr_accessible :translations, :translations_attributes, *attr_names
+          translation_class.attr_accessible *attr_names
+        end
 
         has_many :translations, {
           class_name: translation_class.name,
@@ -112,7 +114,7 @@ module Capito
           setter = "#{attr_name}=".to_sym
           define_method(setter) do |value|
             translation!(Capito.locale).send setter, value
-            attribute_will_change!(getter)
+            attribute_will_change!(getter.to_s)
           end
           define_method(getter) { |locale = Capito.locale| translation(locale).send(getter) if translation(locale) }
         end
@@ -124,47 +126,10 @@ module Capito
         @translation_class ||= define_translation_class
       end
 
-      def respond_to_missing?(method_id, include_private = false)
-        supported_on_missing?(method_id) || super
-      end
-
       private
 
-      def supported_on_missing?(method)
-        match = defined?(::ActiveRecord::DynamicFinderMatch) && ::ActiveRecord::DynamicFinderMatch.match(method)
-        return false unless match
-
-        attribute_names = match.attribute_names.map(&:to_sym)
-        translated_attributes = attribute_names & translated_attribute_names.to_a
-        return false if translated_attributes.empty?
-
-        untranslated_attributes = attribute_names - translated_attributes
-        return false if untranslated_attributes.any? { |attribute| !respond_to?("scoped_by_#{attribute}".to_sym) }
-
-        return [ match, attribute_names, translated_attributes, untranslated_attributes ]
-      end
-
-      def method_missing(method, *args, &block)
-        match, attribute_names, translated_attributes, untranslated_attributes = supported_on_missing?(method)
-        return super unless match
-
-        scope = scoped.includes(:translations)
-
-        translated_attributes.each do |attribute|
-          value = args[attribute_names.index(attribute)]
-          scope = scope.where(translated_column_name(attribute) => value)
-        end
-
-        untranslated_attributes.each do |attribute|
-          value = args[attribute_names.index(attribute)]
-          scope = scope.send("scoped_by_#{attribute}".to_sym, value)
-        end
-
-        if match.instantiator?
-          scoped.send :find_or_instantiator_by_attributes, match, attribute_names, *args, &block
-        else
-          scope.send(match.finder)
-        end
+      def relation
+        super.extending!(QueryMethods)
       end
 
       def translation_foreign_key

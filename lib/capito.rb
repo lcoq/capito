@@ -1,5 +1,4 @@
 require 'active_record'
-require 'patches/active_record/query_methods'
 
 module Capito
   autoload :Translatable, 'capito/translatable'
