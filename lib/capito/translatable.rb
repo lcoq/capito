@@ -68,6 +68,10 @@ module Capito
         includes(:translations).where(locale_field_name => locales).references(:translations)
       end
 
+      def with_current_locale
+        with_translations(Capito.locale)
+      end
+
       def translated_locales
         locale_field_name = [ translation_class.table_name, 'locale' ].join('.')
         joins(:translations).select("DISTINCT #{locale_field_name}").map { |t| t.locale.to_sym }.to_set
