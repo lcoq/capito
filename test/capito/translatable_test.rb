@@ -228,6 +228,19 @@ describe Capito::Translatable do
       subject.translated_locales.must_equal [ :en, :fr ].to_set
     end
 
+    describe '#with_current_locale' do
+      it 'returns the models that are translated in current locale' do
+        en = Capito.with_locale(:en) { subject.new.tap { |m| m.title = 'foo'; m.save! } }
+        fr = Capito.with_locale(:fr) { subject.new.tap { |m| m.title = 'bar'; m.save! } }
+        Capito.locale = :en
+        result = subject.with_current_locale
+        result.must_equal [en]
+        Capito.locale = :fr
+        result = subject.with_current_locale
+        result.must_equal [fr]
+      end
+    end
+
     describe '#with_translations' do
       it 'returns the models that are translated in the locale specified' do
         en = Capito.with_locale(:en) { subject.new.tap { |m| m.title = 'foo'; m.save! } }
