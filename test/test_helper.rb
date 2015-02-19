@@ -21,6 +21,8 @@ require_relative 'data/models'
 require 'minitest/autorun'
 require 'minitest/spec'
 
+require 'rr'
+
 MiniTest::Spec.class_eval do
   def setup
     DatabaseCleaner.start
