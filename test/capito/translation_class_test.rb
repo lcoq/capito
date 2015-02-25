@@ -8,6 +8,14 @@ describe 'Capito translation class' do
     subject.translated_model.must_equal translated_model
   end
 
+  it 'touch the translated model when updated' do
+    translated_model.save!
+    subject.locale = :en
+
+    mock(translated_model).touch
+    subject.save!
+  end
+
   it 'alias the class name demodulized to the translated model' do
     subject.product.must_equal translated_model
   end

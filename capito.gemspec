@@ -13,12 +13,13 @@ Gem::Specification.new do |s|
 
   s.require_paths = ["lib"]
 
-  s.add_dependency 'activerecord', '>= 3.0'
-  s.add_dependency 'activemodel', '>= 3.0'
+  s.add_dependency 'activerecord', '>= 3.0', '< 4.2'
+  s.add_dependency 'activemodel', '>= 3.0', '< 4.2'
 
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'minitest'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'pry'
+  s.add_development_dependency 'rr'
 end

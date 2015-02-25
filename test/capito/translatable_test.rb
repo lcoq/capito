@@ -118,6 +118,19 @@ describe Capito::Translatable do
       translation.title.must_equal 'my new title'
       translation.changed?.must_equal false
     end
+
+    it 'delay touching when ActiveRecord::Base.delay_touching exists' do
+      begin
+        class ActiveRecord::Base
+          def self.delay_touching(&block); :test; end
+        end
+        subject.save.must_equal :test
+      ensure
+        class <<ActiveRecord::Base
+          remove_method :delay_touching
+        end
+      end
+    end
   end
 
   describe 'destroy' do

@@ -54,6 +54,14 @@ module Capito
       translation(locale).try(:destroy)
     end
 
+    def save(*args)
+      if ActiveRecord::Base.respond_to?(:delay_touching)
+        ActiveRecord::Base.delay_touching { super }
+      else
+        super
+      end
+    end
+
     protected
 
     def build_translation_if_empty
@@ -145,7 +153,7 @@ module Capito
         if klass.nil?
           klass = self.const_set(:Translation, Class.new(Capito::Translation))
         end
-        klass.belongs_to :translated_model, class_name: name, foreign_key: translation_foreign_key, inverse_of: :translations
+        klass.belongs_to :translated_model, class_name: name, foreign_key: translation_foreign_key, inverse_of: :translations, touch: true
 
         translated_model_alias = self.to_s.demodulize.underscore
         klass.class_eval %Q{ def #{translated_model_alias}; self.translated_model; end }
