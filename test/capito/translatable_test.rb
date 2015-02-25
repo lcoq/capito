@@ -17,6 +17,19 @@ describe Capito::Translatable do
     subject.title.must_equal 'foo'
   end
 
+  it 'does not change when the translation does not change' do
+    subject.title = 'title'
+    subject.save!
+
+    subject.title = 'title'
+    subject.changes[:title].must_be_nil
+  end
+
+  it 'changes when a translation changes' do
+    subject.title = 'newtitle'
+    subject.changes[:title].wont_be_empty
+  end
+
   it 'translated locales are the persisted locales for this translated model' do
     subject.save!
     subject.translations.create(locale: Capito.locale, title: 'my title')

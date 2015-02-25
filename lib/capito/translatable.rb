@@ -125,8 +125,9 @@ module Capito
           getter = attr_name.to_sym
           setter = "#{attr_name}=".to_sym
           define_method(setter) do |value|
-            translation!(Capito.locale).send setter, value
-            attribute_will_change!(getter.to_s)
+            translation = translation!(Capito.locale)
+            translation.send(setter, value)
+            attribute_will_change!(getter.to_s) if translation.changes[getter]
           end
           define_method(getter) { |locale = Capito.locale| translation(locale).send(getter) if translation(locale) }
         end
