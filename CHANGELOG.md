@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+### Capito 0.0.6 (February 25, 2015)
+
 * Force translated model attribute change only when the translation really changes
 * Save a translation touch the translated model and delay touching when `ActiveRecord::Base#delay_touching` is set
 * Add class method `with_current_locale`
