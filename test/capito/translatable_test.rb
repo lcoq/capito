@@ -166,6 +166,14 @@ describe Capito::Translatable do
       subject.destroy_translation(:fr)
       subject.translation(:fr).destroyed?.must_equal true
     end
+    it 'destroys the model when it has no other translation' do
+      subject.save!
+      subject.translations.create(locale: :fr, title: 'mon titre')
+      subject.save!
+      subject.translation(:fr).destroyed?.must_equal false
+      subject.destroy_translation(:fr)
+      subject.destroyed?.must_equal true
+    end
   end
 
   describe '#translation' do

@@ -63,4 +63,16 @@ describe 'Capito translation class' do
     subject.locale = :en
     subject.valid?.must_equal false
   end
+
+  it 'destroys the translated model when deleting its last translation' do
+    subject.destroy
+    assert_raises(ActiveRecord::RecordNotFound) { translated_model.reload }
+  end
+
+  it 'does not destroy the translated model with multiple translations when deleting one of its translations' do
+    translated_model.save!
+    translated_model.translations.build(locale: :fr, title: 'English title')
+    subject.destroy
+    translated_model.reload
+  end
 end
