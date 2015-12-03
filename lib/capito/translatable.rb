@@ -51,7 +51,9 @@ module Capito
     end
 
     def destroy_translation(locale)
-      translation(locale).try(:destroy)
+      if t = translation(locale)
+        translations.destroy(t)
+      end
     end
 
     def save(*args)

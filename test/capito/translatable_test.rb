@@ -159,12 +159,21 @@ describe Capito::Translatable do
   describe 'destroy_translation' do
     it 'destroys the translation' do
       subject.save!
-      subject.translations.create(locale: :fr, title: 'mon titre')
+      translation = subject.translations.create(locale: :fr, title: 'mon titre')
       subject.translations.create(locale: :en, title: 'my title')
       subject.save!
       subject.translation(:fr).destroyed?.must_equal false
       subject.destroy_translation(:fr)
-      subject.translation(:fr).destroyed?.must_equal true
+      subject.translation(:fr).must_be_nil
+      assert_raises(ActiveRecord::RecordNotFound) { translation.reload }
+    end
+    it 'keeps non-persisted translations' do
+      subject.save!
+      subject.translations.create(locale: :fr, title: 'mon titre')
+      subject.translations.build(locale: :en, title: 'my title')
+      subject.translation(:fr).destroyed?.must_equal false
+      subject.destroy_translation(:fr)
+      subject.translation(:en).title.must_equal 'my title'
     end
     it 'destroys the model when it has no other translation' do
       subject.save!
