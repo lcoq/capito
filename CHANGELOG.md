@@ -2,6 +2,9 @@
 
 ### Unreleased
 
+* `Translatable#destroy_translation` destroys the translation and removes it from the `translations` collection
+* Destroy translated model when deleting its last translation (could be disabled with `translates(destroy_model_without_translation: false`))
+
 ### Capito 0.0.6 (February 25, 2015)
 
 * Force translated model attribute change only when the translation really changes

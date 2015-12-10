@@ -51,7 +51,9 @@ module Capito
     end
 
     def destroy_translation(locale)
-      translation(locale).try(:destroy)
+      if t = translation(locale)
+        translations.destroy(t)
+      end
     end
 
     def save(*args)
@@ -60,6 +62,14 @@ module Capito
       else
         super
       end
+    end
+
+    def will_destroy
+      @will_destroy = true
+    end
+
+    def will_destroy?
+      @will_destroy
     end
 
     protected
@@ -95,13 +105,20 @@ module Capito
 
       # Accepts a list of attribute names that will be translated.
       # Options:
-      #   * autobuild (boolean) will build a translation before validations if there is no translation built
+      #   * autobuild (boolean, default to true) will build a translation before validations if there is no translation built
+      #   * destroy_model_without_translation (boolean, default to true) will destroy the translated model when deleting its last translation
       def translates(*attr_names, &block)
         options = attr_names.extract_options!
 
         unless options[:autobuild] == false
-          before_validation(:build_translation_if_empty)
+          before_validation :build_translation_if_empty
         end
+
+        unless options[:destroy_model_without_translation] == false
+          before_destroy :will_destroy
+        end
+
+        @translation_class = build_translation_class(options)
 
         if defined? ProtectedAttributes
           attr_accessible :translations, :translations_attributes, *attr_names
@@ -136,7 +153,7 @@ module Capito
       end
 
       def translation_class
-        @translation_class ||= define_translation_class
+        @translation_class
       end
 
       private
@@ -149,17 +166,19 @@ module Capito
         table_name.singularize.foreign_key
       end
 
-      def define_translation_class
+      def build_translation_class(options)
         klass = self.const_get(:Translation) rescue nil
-        if klass.nil?
-          klass = self.const_set(:Translation, Class.new(Capito::Translation))
-        end
+        klass = self.const_set(:Translation, Class.new(Capito::Translation)) if klass.nil?
+
         klass.belongs_to :translated_model, class_name: name, foreign_key: translation_foreign_key, inverse_of: :translations, touch: true
 
         translated_model_alias = self.to_s.demodulize.underscore
         klass.class_eval %Q{ def #{translated_model_alias}; self.translated_model; end }
 
         klass.validates :locale, presence: true, uniqueness: { scope: translation_foreign_key }
+
+        klass.after_destroy :destroy_model_without_translation unless options[:destroy_model_without_translation] == false
+
         klass
       end
     end
