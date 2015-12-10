@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+### Capito 0.0.7 (December 10, 2015)
+
 * `Translatable#destroy_translation` destroys the translation and removes it from the `translations` collection
 * Destroy translated model when deleting its last translation (could be disabled with `translates(destroy_model_without_translation: false`))
 
